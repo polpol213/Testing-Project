@@ -1,0 +1,46 @@
+import cv2
+import os
+
+# ASCII characters used to build the output text
+ASCII_CHARS = "@%#*+=-:. "
+
+# Resize the image according to new width
+def resize_image(image, new_width=100):
+    height, width = image.shape
+    ratio = height / width
+    new_height = int(new_width * ratio * 0.55)
+    resized_image = cv2.resize(image, (new_width, new_height))
+    return resized_image
+
+# Convert each pixel to grayscale and then to ASCII
+def image_to_ascii(image, width=100):
+    gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    resized = resize_image(gray_image, width)
+    ascii_image = ""
+    for row in resized:
+        for pixel in row:
+            ascii_image += ASCII_CHARS[pixel // 25]
+        ascii_image += "\n"
+    return ascii_image
+
+def clear():
+    os.system('cls' if os.name == 'nt' else 'clear')
+
+def main():
+    cap = cv2.VideoCapture(0)  # Capture from webcam
+
+    try:
+        while True:
+            ret, frame = cap.read()
+            if not ret:
+                break
+            ascii_frame = image_to_ascii(frame, width=80)
+            clear()
+            print(ascii_frame)
+    except KeyboardInterrupt:
+        print("Exiting...")
+    finally:
+        cap.release()
+
+if __name__ == "__main__":
+    main()
